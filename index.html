@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>虚拟手机 · 锁屏 (极简风)</title>
+<title>虚拟手机 · 锁屏</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,20 +12,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #111; /* 页面背景，衬托手机 */
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    background: radial-gradient(circle at 50% 50%, #2a2a35 0%, #0a0a0f 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
     padding: 20px;
   }
 
   /* ===== 手机外壳 ===== */
   .phone {
     width: 340px;
-    height: 700px;
+    height: 720px; /* 比例大约是 1:2.1，适合大部分竖屏图 */
     background: #000;
     border-radius: 48px;
-    padding: 10px;
+    padding: 8px; /* 黑边框厚度 */
     position: relative;
-    box-shadow:
+    box-shadow: 
       0 0 0 2px #2c2c2e,
       0 0 0 5px #1a1a1a,
       0 40px 80px rgba(0, 0, 0, 0.8),
@@ -33,31 +33,31 @@
   }
 
   /* 侧边按键 */
-  .phone::before,
-  .phone::after {
-    content: "";
-    position: absolute;
-    width: 3px;
-    background: #2c2c2e;
-    border-radius: 2px;
+  .phone::before, .phone::after {
+    content: ""; position: absolute; width: 3px; background: #2c2c2e; border-radius: 2px;
   }
-  .phone::before { left: -4px; top: 130px; height: 65px; }   /* 音量键 */
-  .phone::after  { right: -4px; top: 150px; height: 95px; }  /* 电源键 */
+  .phone::before { left: -4px; top: 130px; height: 65px; }
+  .phone::after  { right: -4px; top: 150px; height: 95px; }
 
-  /* ===== 屏幕 ===== */
+  /* ===== 屏幕区域 ===== */
   .screen {
     width: 100%;
     height: 100%;
-    border-radius: 38px;
+    border-radius: 40px;
     overflow: hidden;
     position: relative;
-    background: #000000; /* 纯黑壁纸 */
-    display: flex;
-    flex-direction: column;
-    color: #fff;
+    
+    /* 🔴 这里替换为你的图片路径 */
+    background-image: url('wallpaper.jpg'); 
+    background-size: cover;      /* 让图片铺满屏幕 */
+    background-position: center; /* 居中对齐 */
+    background-repeat: no-repeat;
+    
+    /* 如果你的图片不是纯黑，可以加一点暗色遮罩让状态栏更清晰 */
+    background-color: #000;
   }
 
-  /* 灵动岛 (保持黑边隐藏) */
+  /* 灵动岛 / 刘海 */
   .dynamic-island {
     position: absolute;
     top: 12px;
@@ -70,191 +70,164 @@
     z-index: 20;
   }
 
-  /* ===== 锁屏核心内容 ===== */
-  .lock-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 70px; /* 往下压一点，避开灵动岛 */
-    z-index: 5;
-  }
-
-  /* 开锁图标 */
-  .lock-icon {
-    font-size: 32px;
-    line-height: 1;
-    margin-bottom: 15px;
-  }
-
-  /* 超大时间 */
-  .time {
-    font-size: 86px;
-    font-weight: 400; /* 图片中的字体偏细 */
-    letter-spacing: -2px;
-    line-height: 1.1;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* 日期 */
-  .date-row {
-    margin-top: 5px;
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-  }
-
-  /* 中间的心形按钮 */
-  .heart-btn {
-    margin-top: 25px;
-    width: 50px;
-    height: 28px;
-    background: #1a1a1a; /* 深灰色背景 */
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .heart-btn:hover {
-    background: #2a2a2a;
-  }
-
-  /* ===== 底部区域 ===== */
-  .bottom-area {
-    width: 100%;
-    padding: 0 30px 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    z-index: 5;
-  }
-
-  /* 底部按钮排布 */
-  .quick-actions {
+  /* ===== 状态栏（叠加在图片上方） ===== */
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-  }
-
-  .qa-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #1a1a1a; /* 深灰色背景 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
-  }
-  .qa-btn:hover {
-    transform: scale(1.1);
-    background: #2a2a2a;
-  }
-  
-  /* 手电筒和相机的 SVG 图标颜色 */
-  .qa-btn svg {
-    width: 22px;
-    height: 22px;
-    fill: #fff;
-  }
-
-  /* 上滑解锁文字 */
-  .swipe-text {
+    padding: 18px 26px 0;
     font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    color: #ffffff;
-    margin-bottom: 10px;
-    animation: bounce 2s infinite; /* 加一点呼吸动画 */
+    color: #fff; /* 如果你的图片背景偏白，请改成 #000 */
+    z-index: 10;
+  }
+  .status-left { display: flex; align-items: center; gap: 6px; }
+  .status-right { display: flex; gap: 6px; align-items: center; }
+
+  .signal { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+  .signal span { width: 3px; background: #fff; border-radius: 1px; }
+  .signal span:nth-child(1) { height: 4px; }
+  .signal span:nth-child(2) { height: 7px; }
+  .signal span:nth-child(3) { height: 9px; }
+  .signal span:nth-child(4) { height: 12px; opacity: 0.4; }
+
+  .wifi { font-size: 13px; }
+  .battery {
+    width: 26px; height: 13px;
+    border: 1.5px solid #fff;
+    border-radius: 4px;
+    position: relative;
+    padding: 1.5px;
+  }
+  .battery::after {
+    content: ""; position: absolute; right: -4px; top: 4px;
+    width: 2px; height: 5px; background: #fff; border-radius: 0 1px 1px 0;
+  }
+  .battery-fill { width: 78%; height: 100%; background: #fff; border-radius: 1.5px; }
+
+  /* ===== 底部 Home 指示条 ===== */
+  .home-bar {
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    z-index: 10;
   }
 
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.8; }
-    50% { transform: translateY(-5px); opacity: 1; }
+  /* ===== 上滑解锁交互区域（隐形） ===== */
+  .swipe-area {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    z-index: 30;
+    cursor: grab;
   }
+  .swipe-area:active { cursor: grabbing; }
 
 </style>
 </head>
 <body>
 
 <div class="phone">
-  <div class="screen">
-
+  <div class="screen" id="screen">
+    
     <!-- 灵动岛 -->
     <div class="dynamic-island"></div>
 
-    <!-- 锁屏内容 -->
-    <div class="lock-content">
-      
-      <!-- 开锁图标 -->
-      <div class="lock-icon">🔓</div>
-
-      <!-- 时间 -->
-      <div class="time" id="clock">09:46</div>
-
-      <!-- 日期 (图片中为英文) -->
-      <div class="date-row" id="dateText">Tuesday, 21 December</div>
-
-      <!-- 心形按钮 -->
-      <div class="heart-btn">🤍</div>
-
-    </div>
-
-    <!-- 底部区域 -->
-    <div class="bottom-area">
-      
-      <!-- 快捷按钮 -->
-      <div class="quick-actions">
-        <!-- 手电筒图标 (SVG) -->
-        <div class="qa-btn">
-          <svg viewBox="0 0 24 24"><path d="M11 2h2v2h-2V2zm-1 3h4v3h-4V5zm-1 4h6v13a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V9zm2 2v2h2v-2h-2z"/></svg>
-        </div>
-        <!-- 相机图标 (SVG) -->
-        <div class="qa-btn">
-          <svg viewBox="0 0 24 24"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
-        </div>
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <div class="status-left">
+        <!-- 可以在图片上留空，或者放一个时间 -->
       </div>
-
-      <!-- 上滑解锁文字 -->
-      <div class="swipe-text">Swipe up to unlock</div>
-
+      <div class="status-right">
+        <div class="signal"><span></span><span></span><span></span><span></span></div>
+        <span class="wifi">📶</span>
+        <div class="battery"><div class="battery-fill"></div></div>
+      </div>
     </div>
+
+    <!-- 底部 Home 条 -->
+    <div class="home-bar"></div>
+
+    <!-- 上滑解锁感应区 -->
+    <div class="swipe-area" id="swipeArea"></div>
 
   </div>
 </div>
 
 <script>
-  // 实时时间 + 英文日期
-  function updateClock() {
-    const now = new Date();
+  // 简单的上滑解锁动画演示
+  const screen = document.getElementById('screen');
+  const swipeArea = document.getElementById('swipeArea');
+  let startY = 0;
+  let isDragging = false;
 
-    // 时间：HH:MM（补零）
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById('clock').textContent = `${h}:${m}`;
+  // 支持鼠标和触摸
+  const getY = (e) => e.touches ? e.touches[0].clientY : e.clientY;
 
-    // 英文日期：Tuesday, 21 December
-    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    
-    const dayName = days[now.getDay()];
-    const dayNum = now.getDate();
-    const monthName = months[now.getMonth()];
-    
-    document.getElementById('dateText').textContent = `${dayName}, ${dayNum} ${monthName}`;
+  swipeArea.addEventListener('mousedown', startSwipe);
+  swipeArea.addEventListener('touchstart', startSwipe, {passive: true});
+
+  function startSwipe(e) {
+    startY = getY(e);
+    isDragging = true;
+    screen.style.transition = 'none';
   }
 
-  updateClock();
-  setInterval(updateClock, 1000); // 每秒刷新一次，保证时间准确
+  document.addEventListener('mousemove', moveSwipe);
+  document.addEventListener('touchmove', moveSwipe, {passive: false});
 
+  function moveSwipe(e) {
+    if (!isDragging) return;
+    const currentY = getY(e);
+    const diff = currentY - startY;
+    
+    // 只允许向上滑动（diff < 0）
+    if (diff < 0) {
+      // 跟着手指移动，带点阻尼
+      screen.style.transform = `translateY(${diff * 0.8}px)`;
+      screen.style.opacity = 1 + (diff / 600); // 越往上越透明
+    }
+  }
+
+  document.addEventListener('mouseup', endSwipe);
+  document.addEventListener('touchend', endSwipe);
+
+  function endSwipe() {
+    if (!isDragging) return;
+    isDragging = false;
+    screen.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease';
+    
+    // 获取当前的位移
+    const currentTransform = screen.style.transform;
+    const match = currentTransform.match(/translateY\(([-0-9.]+)px\)/);
+    const currentY = match ? parseFloat(match[1]) : 0;
+
+    if (currentY < -100) {
+      // 滑得足够高，直接解锁（滑出屏幕）
+      screen.style.transform = 'translateY(-100%)';
+      screen.style.opacity = '0';
+      
+      // 解锁后的操作，比如0.5秒后恢复或显示桌面
+      setTimeout(() => {
+        alert('已解锁！你可以在这里用 JS 切换到主屏幕。');
+        // 恢复初始状态
+        screen.style.transform = 'translateY(0)';
+        screen.style.opacity = '1';
+      }, 500);
+
+    } else {
+      // 没滑到位，弹回原位
+      screen.style.transform = 'translateY(0)';
+      screen.style.opacity = '1';
+    }
+  }
 </script>
 
 </body>
