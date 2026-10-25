@@ -1,559 +1,260 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>虚拟手机 · 锁屏</title>
+<title>虚拟手机 · 锁屏 (极简风)</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at 50% 30%, #17151f, #060608 75%);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                 "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
-    padding: 24px;
-    overflow: hidden;
+    background: #111; /* 页面背景，衬托手机 */
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    padding: 20px;
   }
 
-  /* ================= 手机外壳 ================= */
+  /* ===== 手机外壳 ===== */
   .phone {
-    width: 360px;
-    height: 740px;
-    background: linear-gradient(145deg, #3a3a3c 0%, #1c1c1e 30%, #0a0a0a 100%);
-    border-radius: 54px;
-    padding: 11px;
+    width: 340px;
+    height: 700px;
+    background: #000;
+    border-radius: 48px;
+    padding: 10px;
     position: relative;
     box-shadow:
-      0 0 0 1px rgba(255,255,255,0.08),
-      0 0 0 4px #1a1a1c,
-      0 0 0 5px rgba(255,255,255,0.05),
-      0 50px 100px -20px rgba(0,0,0,0.9),
-      0 30px 60px -30px rgba(120,100,255,0.25),
-      inset 0 1px 1px rgba(255,255,255,0.15);
-    transform: perspective(1200px) rotateX(2deg);
-  }
-
-  /* 金属边框高光 */
-  .phone::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 54px;
-    padding: 1px;
-    background: linear-gradient(160deg,
-      rgba(255,255,255,0.35) 0%,
-      rgba(255,255,255,0.05) 25%,
-      transparent 50%,
-      rgba(255,255,255,0.08) 75%,
-      rgba(255,255,255,0.25) 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+      0 0 0 2px #2c2c2e,
+      0 0 0 5px #1a1a1a,
+      0 40px 80px rgba(0, 0, 0, 0.8),
+      inset 0 0 0 1px #3a3a3c;
   }
 
   /* 侧边按键 */
-  .btn-side {
+  .phone::before,
+  .phone::after {
+    content: "";
     position: absolute;
-    background: linear-gradient(90deg, #2c2c2e, #48484a);
+    width: 3px;
+    background: #2c2c2e;
     border-radius: 2px;
-    box-shadow: inset 0 0 2px rgba(0,0,0,0.6);
   }
-  .btn-mute   { left: -3px; top: 120px; width: 4px; height: 32px; }
-  .btn-vol-up { left: -3px; top: 175px; width: 4px; height: 58px; }
-  .btn-vol-dn { left: -3px; top: 245px; width: 4px; height: 58px; }
-  .btn-power  { right: -3px; top: 195px; width: 4px; height: 92px;
-                background: linear-gradient(270deg, #2c2c2e, #48484a); }
+  .phone::before { left: -4px; top: 130px; height: 65px; }   /* 音量键 */
+  .phone::after  { right: -4px; top: 150px; height: 95px; }  /* 电源键 */
 
-  /* ================= 屏幕 ================= */
+  /* ===== 屏幕 ===== */
   .screen {
     width: 100%;
     height: 100%;
-    border-radius: 44px;
+    border-radius: 38px;
     overflow: hidden;
     position: relative;
-    background: #000;
-    isolation: isolate;
+    background: #000000; /* 纯黑壁纸 */
+    display: flex;
+    flex-direction: column;
+    color: #fff;
   }
 
-  /* 壁纸层：多层光晕模拟景深 */
-  .wallpaper {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background:
-      radial-gradient(ellipse 60% 45% at 25% 18%, rgba(140, 110, 255, 0.55), transparent 70%),
-      radial-gradient(ellipse 55% 40% at 80% 25%, rgba(255, 100, 170, 0.35), transparent 65%),
-      radial-gradient(ellipse 70% 50% at 65% 70%, rgba(50, 180, 255, 0.28), transparent 70%),
-      radial-gradient(ellipse 50% 40% at 15% 80%, rgba(255, 150, 80, 0.18), transparent 65%),
-      linear-gradient(165deg, #241a3d 0%, #140f28 40%, #0a0715 75%, #030308 100%);
-  }
-
-  /* 壁纸颗粒质感 */
-  .wallpaper::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0.04;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    mix-blend-mode: overlay;
-  }
-
-  /* 屏幕玻璃反光 */
-  .screen::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 30;
-    pointer-events: none;
-    background: linear-gradient(125deg,
-      rgba(255,255,255,0.10) 0%,
-      rgba(255,255,255,0.02) 18%,
-      transparent 40%,
-      transparent 70%,
-      rgba(255,255,255,0.015) 100%);
-    border-radius: 44px;
-  }
-
-  /* ================= 灵动岛 ================= */
+  /* 灵动岛 (保持黑边隐藏) */
   .dynamic-island {
     position: absolute;
-    top: 11px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 118px;
-    height: 34px;
+    width: 110px;
+    height: 32px;
     background: #000;
     border-radius: 20px;
-    z-index: 25;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), inset 0 0 6px rgba(0,0,0,0.9);
-  }
-  /* 灵动岛里隐藏的前摄 */
-  .dynamic-island::after {
-    content: "";
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #1a2a3a, #05070a 70%);
-    box-shadow: inset 0 0 2px rgba(80,140,200,0.5);
-  }
-
-  /* ================= 状态栏 ================= */
-  .status-bar {
-    position: relative;
     z-index: 20;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 17px 30px 0;
-    height: 54px;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.2px;
   }
-  .status-right { display: flex; gap: 7px; align-items: center; }
 
-  /* 信号条 */
-  .signal { display: flex; align-items: flex-end; gap: 2.5px; height: 11px; }
-  .signal i {
-    width: 3.5px;
-    background: #fff;
-    border-radius: 1px;
-    display: block;
-  }
-  .signal i:nth-child(1) { height: 4px; }
-  .signal i:nth-child(2) { height: 6.5px; }
-  .signal i:nth-child(3) { height: 8.5px; }
-  .signal i:nth-child(4) { height: 11px; opacity: 0.35; }
-
-  /* WiFi SVG */
-  .wifi-icon { width: 16px; height: 12px; display: block; }
-
-  /* 电池 */
-  .battery {
-    width: 27px; height: 13px;
-    border: 1.2px solid rgba(255,255,255,0.85);
-    border-radius: 3.5px;
-    position: relative;
-    padding: 1.5px;
-    box-sizing: border-box;
-  }
-  .battery::after {
-    content: "";
-    position: absolute;
-    right: -3.5px; top: 3.5px;
-    width: 2px; height: 4.5px;
-    background: rgba(255,255,255,0.65);
-    border-radius: 0 1px 1px 0;
-  }
-  .battery-fill {
-    width: 78%; height: 100%;
-    background: #fff;
-    border-radius: 1.5px;
-  }
-  .battery.low .battery-fill { background: #ffd60a; }
-
-  /* ================= 锁屏内容 ================= */
+  /* ===== 锁屏核心内容 ===== */
   .lock-content {
-    position: relative;
-    z-index: 10;
-    height: calc(100% - 54px);
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 22px;
+    padding-top: 70px; /* 往下压一点，避开灵动岛 */
+    z-index: 5;
   }
 
-  /* 锁图标 */
+  /* 开锁图标 */
   .lock-icon {
-    margin-top: 30px;
-    width: 30px; height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .lock-icon svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); }
-
-  /* 时间：超大超细 */
-  .time {
-    margin-top: 6px;
-    font-size: 96px;
-    font-weight: 200;
-    letter-spacing: -4px;
+    font-size: 32px;
     line-height: 1;
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-    text-shadow:
-      0 2px 24px rgba(160, 130, 255, 0.45),
-      0 0 2px rgba(255,255,255,0.3);
-    /* 小写冒号闪烁 */
+    margin-bottom: 15px;
   }
-  .time .colon { opacity: 1; animation: blink 2s infinite; }
-  @keyframes blink { 0%,45%,55%,100% { opacity: 1; } 50% { opacity: 0.25; } }
 
-  /* 日期行 */
+  /* 超大时间 */
+  .time {
+    font-size: 86px;
+    font-weight: 400; /* 图片中的字体偏细 */
+    letter-spacing: -2px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 日期 */
   .date-row {
-    margin-top: 6px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
+    margin-top: 5px;
     font-size: 18px;
     font-weight: 500;
-    color: rgba(255,255,255,0.95);
-    letter-spacing: 0.3px;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.35);
-  }
-  .date-row .sep {
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.55);
-  }
-  .date-row .year {
-    color: rgba(255,255,255,0.6);
-    font-weight: 400;
-    font-size: 16px;
+    letter-spacing: 0.2px;
+    color: #ffffff;
   }
 
-  /* ================= 通知卡片 ================= */
-  .notifications {
-    width: 100%;
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-  }
-
-  .notif {
-    display: flex;
-    gap: 11px;
-    padding: 12px 13px;
-    background: rgba(255,255,255,0.11);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.13);
+  /* 中间的心形按钮 */
+  .heart-btn {
+    margin-top: 25px;
+    width: 50px;
+    height: 28px;
+    background: #1a1a1a; /* 深灰色背景 */
     border-radius: 20px;
-    align-items: center;
-    box-shadow:
-      0 4px 20px rgba(0,0,0,0.25),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-    animation: slideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-    transition: background 0.25s, transform 0.25s;
-    cursor: pointer;
-  }
-  .notif:hover {
-    background: rgba(255,255,255,0.17);
-    transform: scale(1.015);
-  }
-  .notif:active { transform: scale(0.985); }
-  .notif:nth-child(1) { animation-delay: 0.15s; }
-  .notif:nth-child(2) { animation-delay: 0.28s; }
-  .notif:nth-child(3) { animation-delay: 0.41s; }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(16px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  .notif-icon {
-    width: 36px; height: 36px;
-    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
   }
-  .notif-icon svg { width: 20px; height: 20px; }
+  .heart-btn:hover {
+    background: #2a2a2a;
+  }
 
-  /* 图标底色 */
-  .ni-msg { background: linear-gradient(145deg, #34d399, #059669); }
-  .ni-cam { background: linear-gradient(145deg, #f472b6, #db2777); }
-  .ni-sys { background: linear-gradient(145deg, #60a5fa, #2563eb); }
-
-  .notif-body { flex: 1; min-width: 0; }
-  .notif-head {
+  /* ===== 底部区域 ===== */
+  .bottom-area {
+    width: 100%;
+    padding: 0 30px 30px;
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 2px;
-  }
-  .notif-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.1px;
-  }
-  .notif-time {
-    font-size: 11px;
-    color: rgba(255,255,255,0.55);
-    font-weight: 400;
-  }
-  .notif-text {
-    font-size: 12.5px;
-    color: rgba(255,255,255,0.75);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 5;
   }
 
-  /* ================= 底部快捷按钮 ================= */
+  /* 底部按钮排布 */
   .quick-actions {
-    position: absolute;
-    bottom: 52px;
-    left: 0; right: 0;
-    z-index: 15;
     display: flex;
     justify-content: space-between;
-    padding: 0 34px;
+    align-items: center;
+    width: 100%;
   }
 
   .qa-btn {
-    width: 52px; height: 52px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.13);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: #1a1a1a; /* 深灰色背景 */
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 22px;
     cursor: pointer;
-    transition: transform 0.18s, background 0.18s;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.2s;
   }
-  .qa-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.06); }
-  .qa-btn:active { transform: scale(0.94); }
-  .qa-btn svg { width: 22px; height: 22px; }
-
-  /* ================= Home 指示条 ================= */
-  .home-bar {
-    position: absolute;
-    bottom: 9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 134px;
-    height: 5px;
-    background: rgba(255,255,255,0.65);
-    border-radius: 3px;
-    z-index: 20;
+  .qa-btn:hover {
+    transform: scale(1.1);
+    background: #2a2a2a;
+  }
+  
+  /* 手电筒和相机的 SVG 图标颜色 */
+  .qa-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: #fff;
   }
 
-  /* 红点 badge */
-  .badge-dot {
-    position: absolute;
-    top: -2px; right: -2px;
-    width: 10px; height: 10px;
-    background: #ff453a;
-    border-radius: 50%;
-    border: 1.5px solid rgba(30,30,40,0.9);
+  /* 上滑解锁文字 */
+  .swipe-text {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    animation: bounce 2s infinite; /* 加一点呼吸动画 */
   }
-  .notif-icon-wrap { position: relative; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.8; }
+    50% { transform: translateY(-5px); opacity: 1; }
+  }
+
 </style>
 </head>
 <body>
 
 <div class="phone">
-  <!-- 侧边按键 -->
-  <div class="btn-side btn-mute"></div>
-  <div class="btn-side btn-vol-up"></div>
-  <div class="btn-side btn-vol-dn"></div>
-  <div class="btn-side btn-power"></div>
-
   <div class="screen">
-    <!-- 壁纸 -->
-    <div class="wallpaper"></div>
 
     <!-- 灵动岛 -->
     <div class="dynamic-island"></div>
 
-    <!-- 状态栏 -->
-    <div class="status-bar">
-      <span id="statusTime">9:41</span>
-      <div class="status-right">
-        <div class="signal"><i></i><i></i><i></i><i></i></div>
-        <svg class="wifi-icon" viewBox="0 0 16 12" fill="none">
-          <path d="M1 4.2C3 2.4 5.4 1.5 8 1.5s5 .9 7 2.7" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M3.2 6.8C4.5 5.6 6.2 5 8 5s3.5.6 4.8 1.8" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M5.4 9.2C6.2 8.5 7 8.2 8 8.2s1.8.3 2.6 1" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-          <circle cx="8" cy="11" r="1" fill="#fff"/>
-        </svg>
-        <div class="battery low"><div class="battery-fill"></div></div>
-      </div>
-    </div>
-
     <!-- 锁屏内容 -->
     <div class="lock-content">
-      <!-- 锁图标 -->
-      <div class="lock-icon">
-        <svg viewBox="0 0 24 24" fill="none">
-          <rect x="5" y="10.5" width="14" height="10" rx="3" fill="rgba(255,255,255,0.9)"/>
-          <path d="M8 10.5V7.5a4 4 0 018 0v3" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="12" cy="15.5" r="1.3" fill="#2a1a4a"/>
-        </svg>
-      </div>
+      
+      <!-- 开锁图标 -->
+      <div class="lock-icon">🔓</div>
 
       <!-- 时间 -->
-      <div class="time" id="clock">9<span class="colon">:</span>41</div>
+      <div class="time" id="clock">09:46</div>
 
-      <!-- 日期 + 年份 -->
-      <div class="date-row">
-        <span id="weekday">星期一</span>
-        <span class="sep"></span>
-        <span id="monthDay">1月1日</span>
-        <span class="sep"></span>
-        <span class="year" id="year">2025</span>
-      </div>
+      <!-- 日期 (图片中为英文) -->
+      <div class="date-row" id="dateText">Tuesday, 21 December</div>
 
-      <!-- 通知 -->
-      <div class="notifications">
-        <div class="notif">
-          <div class="notif-icon-wrap">
-            <div class="notif-icon ni-msg">
-              <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3C6.9 3 3 6.4 3 10.6c0 2.4 1.4 4.5 3.6 5.9-.2.9-.7 2.2-1.6 3.3-.2.3.1.6.4.5 1.9-.4 3.4-1.3 4.3-1.9.7.1 1.5.2 2.3.2 5.1 0 9-3.4 9-7.6S17.1 3 12 3z"/></svg>
-            </div>
-            <span class="badge-dot"></span>
-          </div>
-          <div class="notif-body">
-            <div class="notif-head">
-              <span class="notif-title">未知号码</span>
-              <span class="notif-time">刚刚</span>
-            </div>
-            <div class="notif-text">你捡到这部手机了吗？</div>
-          </div>
-        </div>
+      <!-- 心形按钮 -->
+      <div class="heart-btn">🤍</div>
 
-        <div class="notif">
-          <div class="notif-icon-wrap">
-            <div class="notif-icon ni-cam">
-              <svg viewBox="0 0 24 24" fill="#fff"><path d="M9 4l-1.2 1.8H4.5A1.5 1.5 0 003 7.3v10.2A1.5 1.5 0 004.5 19h15a1.5 1.5 0 001.5-1.5V7.3a1.5 1.5 0 00-1.5-1.5h-3.3L15 4H9zm3 4.5a4 4 0 110 8 4 4 0 010-8z"/></svg>
-            </div>
-            <span class="badge-dot"></span>
-          </div>
-          <div class="notif-body">
-            <div class="notif-head">
-              <span class="notif-title">相册</span>
-              <span class="notif-time">2 分钟前</span>
-            </div>
-            <div class="notif-text">昨晚 23:47 有 5 张新照片</div>
-          </div>
-        </div>
-
-        <div class="notif">
-          <div class="notif-icon-wrap">
-            <div class="notif-icon ni-sys">
-              <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 2h8a2 2 0 012 2v16a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2zm4 3.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM9 17h6v1.5H9V17z"/></svg>
-            </div>
-          </div>
-          <div class="notif-body">
-            <div class="notif-head">
-              <span class="notif-title">系统</span>
-              <span class="notif-time">5 分钟前</span>
-            </div>
-            <div class="notif-text">电量仅剩 18%，请尽快充电</div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- 底部快捷按钮 -->
-    <div class="quick-actions">
-      <div class="qa-btn" title="手电筒">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M9 3h6v4l-1.5 2v11a1.5 1.5 0 01-3 0V9L9 7V3z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
-          <circle cx="12" cy="13" r="1.2" fill="#fff"/>
-        </svg>
+    <!-- 底部区域 -->
+    <div class="bottom-area">
+      
+      <!-- 快捷按钮 -->
+      <div class="quick-actions">
+        <!-- 手电筒图标 (SVG) -->
+        <div class="qa-btn">
+          <svg viewBox="0 0 24 24"><path d="M11 2h2v2h-2V2zm-1 3h4v3h-4V5zm-1 4h6v13a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V9zm2 2v2h2v-2h-2z"/></svg>
+        </div>
+        <!-- 相机图标 (SVG) -->
+        <div class="qa-btn">
+          <svg viewBox="0 0 24 24"><path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+        </div>
       </div>
-      <div class="qa-btn" title="相机">
-        <svg viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="7" width="18" height="12" rx="3" stroke="#fff" stroke-width="1.6"/>
-          <circle cx="12" cy="13" r="3.5" stroke="#fff" stroke-width="1.6"/>
-          <path d="M8 7l1.5-2h5L16 7" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
-        </svg>
-      </div>
+
+      <!-- 上滑解锁文字 -->
+      <div class="swipe-text">Swipe up to unlock</div>
+
     </div>
 
-    <!-- Home 指示条 -->
-    <div class="home-bar"></div>
   </div>
 </div>
 
 <script>
+  // 实时时间 + 英文日期
   function updateClock() {
     const now = new Date();
+
+    // 时间：HH:MM（补零）
     const h = String(now.getHours()).padStart(2, '0');
     const m = String(now.getMinutes()).padStart(2, '0');
-    const timeStr = `${h}:${m}`;
+    document.getElementById('clock').textContent = `${h}:${m}`;
 
-    // 大时间保留冒号闪烁结构
-    document.getElementById('clock').innerHTML =
-      `${h}<span class="colon">:</span>${m}`;
-    document.getElementById('statusTime').textContent = timeStr;
-
-    const weekdays = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
-    document.getElementById('weekday').textContent = weekdays[now.getDay()];
-    document.getElementById('monthDay').textContent = `${now.getMonth()+1}月${now.getDate()}日`;
-    document.getElementById('year').textContent = now.getFullYear();
+    // 英文日期：Tuesday, 21 December
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    
+    const dayName = days[now.getDay()];
+    const dayNum = now.getDate();
+    const monthName = months[now.getMonth()];
+    
+    document.getElementById('dateText').textContent = `${dayName}, ${dayNum} ${monthName}`;
   }
-  updateClock();
-  setInterval(updateClock, 1000 * 30);
 
-  // 通知点击反馈
-  document.querySelectorAll('.notif').forEach(n => {
-    n.addEventListener('click', () => {
-      n.style.background = 'rgba(140,170,255,0.30)';
-      setTimeout(() => n.style.background = '', 350);
-    });
-  });
+  updateClock();
+  setInterval(updateClock, 1000); // 每秒刷新一次，保证时间准确
+
 </script>
 
 </body>
